@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum provider {
+  SUPABASE
+}
+
+model user {
+  id              String          @id @default(uuid())
+  loginProviderId String          @unique
+  loginProvider   provider        @default(SUPABASE)
+  name            String
+  username        String          @unique
+  email           String          @unique
+  profilePicture  String?
+  enabled         Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  trail           trail[]
+  trail_post      trail_post[]
+  trail_ranking   trail_ranking[]
+}
+
+model trail {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user          user            @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  trail_post    trail_post[]
+  trail_ranking trail_ranking[]
+}
+
+model trail_post {
+  id      String  @id @default(uuid())
+  trailId String
+  title   String
+  content String?
+  picture String?
+
+  ownerId String
+
+  trail trail @relation(fields: [trailId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user  user  @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model trail_ranking {
+  id         String @id @default(uuid())
+  trailId    String
+  ownerId    String
+  sequential Int
+
+  trail trail @relation(fields: [trailId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user  user  @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
