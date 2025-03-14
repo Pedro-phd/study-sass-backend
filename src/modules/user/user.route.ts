@@ -1,9 +1,15 @@
-import { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify";
 
 export const userRoutes = async (server: FastifyInstance) => {
 
-  server.get('/', {}, async (request, reply) => {
-    const users = await server.prisma.user.findMany();
-    return reply.send(users);
+  server.get('/', {
+    onRequest: [server.auth],
+    schema: {
+      security: [
+        { bearerAuth: [] }
+      ]
+    }
+  }, async (req, reply) => {
+    return reply.send(req.user);
   });
 };

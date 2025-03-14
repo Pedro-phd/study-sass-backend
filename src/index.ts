@@ -1,6 +1,9 @@
 import { buildServer } from '@/server';
+import dotenv from 'dotenv';
+
 
 async function main() {
+  dotenv.config();
   const server = await buildServer();
 
   try {
