@@ -35,7 +35,19 @@ export const GetTrailById = async (trailId: string, userId?: string) => {
             }
           }
         }
+      },
+      trail_ranking: {
+       select: {
+        sequential: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            username:true
+          }
+       }
       }
+    }
     }
   })
   return trail

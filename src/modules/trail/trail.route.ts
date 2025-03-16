@@ -22,7 +22,6 @@ export const trailRoutes = async (server: FastifyInstance) => {
 
   server.addHook('preHandler', (routeOptions, reply, done) => {
     if(routeOptions.url.startsWith('/trail')) {
-      console.log("user:", routeOptions.user)
       if(!routeOptions?.user?.id) {
         return reply.status(401).send({
           message: "User not created in internal database"
@@ -78,7 +77,7 @@ export const trailRoutes = async (server: FastifyInstance) => {
   }, async (req, res) => {
     const trail = await service.UpdateTrail(req.params.trailId, req.body, req.user.id)
   })
-  
+
   //soft delete trail
   typedServer.delete('/:trailId', {
     onRequest: [server.auth],

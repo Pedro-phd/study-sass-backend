@@ -9,6 +9,7 @@ import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fast
 import authPlugin from './plugins/auth';
 import injectUserPlugin from './plugins/injectUser';
 import { trailRoutes } from './modules/trail/trail.route';
+import { trailPostRoutes } from './modules/trail-post/trail-post.routes';
 
 export async function buildServer(): Promise<FastifyInstance> {
   const server = fastify({
@@ -72,6 +73,7 @@ export async function buildServer(): Promise<FastifyInstance> {
   // Register routes
   await server.register(userRoutes, { prefix: '/users', logLevel: 'info' });
   await server.register(trailRoutes, { prefix: '/trail', logLevel: 'info' });
+  await server.register(trailPostRoutes, { prefix: '/trail/:trailId/post', logLevel: 'info' });
 
 
   return server;
