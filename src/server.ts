@@ -4,8 +4,12 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import fastifyJwt, { FastifyJWT } from '@fastify/jwt'
 
-import { healthcheckRoutes } from '@/routes/healthcheck';
 import { userRoutes } from './modules/user/user.route';
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
+import { prisma } from './infra/prisma-client';
+import { user } from './domain';
+import authPlugin from './plugins/auth';
+import injectUserPlugin from './plugins/injectUser';
 
 export async function buildServer(): Promise<FastifyInstance> {
   const server = fastify({
@@ -18,7 +22,10 @@ export async function buildServer(): Promise<FastifyInstance> {
         },
       },
     },
-  });
+  })
+
+  server.setValidatorCompiler(validatorCompiler);
+  server.setSerializerCompiler(serializerCompiler);
 
   // Register plugins
   await server.register(cors, {
@@ -35,48 +42,36 @@ export async function buildServer(): Promise<FastifyInstance> {
     return next() 
   })
 
-  server.decorate("auth", async (req: FastifyRequest, reply: FastifyReply) => {
-    try {
-      await req.jwtVerify();
-    } catch (err) {
-      req.log.error({ error: err, message: 'Unauthorized' })
-      reply.status(401).send({ error: err, message: 'Unauthorized' })
-    }
-  });
+  server.register(authPlugin)
+  server.register(injectUserPlugin)
 
   // Swagger documentation
   await server.register(swagger, {
-    swagger: {
+    openapi: {
       info: {
-        title: 'Clean Architecture API',
+        title: 'Til API',
         description: 'API documentation with Swagger',
         version: '1.0.0',
       },
-      host: 'localhost:3000',
-      schemes: ['http'],
-      consumes: ['application/json'],
-      produces: ['application/json'],
-      tags: [
-        { name: 'users', description: 'User related end-points' },
-      ],
-      securityDefinitions: {
-        bearerAuth: {
-          type: 'apiKey',
-          name: 'Authorization',
-          in: 'header',
-          description: 'Insira o token JWT com o prefixo Bearer'
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'apiKey',
+            name: 'Authorization',
+            in: 'header'
+          }
         }
-      }
+      },
     },
+    transform: jsonSchemaTransform
   });
   
   await server.register(swaggerUi, {
-    routePrefix: '/docs'
+    routePrefix: '/api'
   });
 
   // Register routes
-  await server.register(healthcheckRoutes, { prefix: '/health' });
-  await server.register(userRoutes, { prefix: '/users' });
+  await server.register(userRoutes, { prefix: '/users', logLevel: 'info' });
 
 
   return server;
