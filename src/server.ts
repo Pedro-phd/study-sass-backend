@@ -1,15 +1,14 @@
-import fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
+import fastify, { type FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
-import fastifyJwt, { FastifyJWT } from '@fastify/jwt'
+import fastifyJwt from '@fastify/jwt'
 
 import { userRoutes } from './modules/user/user.route';
-import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
-import { prisma } from './infra/prisma-client';
-import { user } from './domain';
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import authPlugin from './plugins/auth';
 import injectUserPlugin from './plugins/injectUser';
+import { trailRoutes } from './modules/trail/trail.route';
 
 export async function buildServer(): Promise<FastifyInstance> {
   const server = fastify({
@@ -72,6 +71,7 @@ export async function buildServer(): Promise<FastifyInstance> {
 
   // Register routes
   await server.register(userRoutes, { prefix: '/users', logLevel: 'info' });
+  await server.register(trailRoutes, { prefix: '/trail', logLevel: 'info' });
 
 
   return server;
