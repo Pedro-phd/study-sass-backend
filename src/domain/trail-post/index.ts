@@ -1,0 +1,1 @@
+export * from './trail-post.model';

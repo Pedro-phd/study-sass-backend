@@ -48,7 +48,7 @@ export interface IJwt {
   is_anonymous: boolean;
 }
 
-export interface  IIintertalJWT extends IJwt {
+export interface  IInternalJWT extends IJwt {
   id: string; //internal id -> db id
   loginProviderId: string; // id for platform login -> supabase id
 }

@@ -56,7 +56,7 @@ export const userRoutes = async (server: FastifyInstance) => {
       description: 'Criar usuário no banco de dados'
     },
   }, async (req, res) => {
-      const user = await service.CreateUser(req.body);
+      const user = await service.CreateUser(req.body, req.user);
       return res.send(user);
   });
 

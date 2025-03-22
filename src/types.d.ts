@@ -1,7 +1,7 @@
 import type { JWT } from "@fastify/jwt"
 import type { RouteGenericInterface } from "fastify"
 import '@fastify/jwt'
-import type { IIintertalJWT } from "./domain"
+import type { IInternalJWT } from "./domain"
 
 export interface FastifyInstanceWithTypeProvider extends FastifyInstance<RawServerBase,
 RawRequestDefaultExpression,
@@ -32,6 +32,6 @@ declare module '@fastify/jwt' {
       role: string;
       // Adicione outros campos que você tem no seu payload
     }
-    user: IIintertalJWT
+    user: IInternalJWT
   }
 }
