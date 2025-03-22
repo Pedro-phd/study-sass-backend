@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { user } from "../../../domain/user/user.model.ts"
+import { user } from "@/domain"
 
 export const CreateUserSchema = user.omit({
   id: true,
