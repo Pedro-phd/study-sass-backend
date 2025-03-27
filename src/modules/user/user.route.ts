@@ -71,13 +71,8 @@ export const userRoutes = async (server: FastifyInstance) => {
     }
   }, async (req, res) => {
     const isAvailable = await service.CheckUsernameIsAvailable(req.params.username)
-    if (!isAvailable) {
-      return res.status(409).send({
-        message: 'Username is not available'
-      })
-    }
     return res.send({
-      message: 'Username is available'
+      message: isAvailable
     })
   })
 }
