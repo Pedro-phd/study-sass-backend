@@ -1,6 +1,6 @@
 import { prisma } from "@/infra/prisma-client"
 import { ICreateTrail } from "./dto"
-import { NotFoundError } from "@/domain"
+import { ForbiddenError, NotFoundError } from "@/domain"
 
 export const GetMyTrails = async (userId: string) => {
   const trails = await prisma.trail.findMany({
@@ -54,6 +54,32 @@ export const GetTrailById = async (trailId: string, userId?: string) => {
 }
 
 export const CreateTrail = async (trail: ICreateTrail, userId: string) => {
+
+  const getPlan = await prisma.user.findUnique({
+    where: {
+      id: userId
+    },
+    select: {
+      plan: true
+    }
+  })
+
+  const totalTrails = await prisma.trail.count({
+    where: {
+      user: {
+        id: userId
+      }
+    }
+  })
+
+  if (!getPlan?.plan?.maxTrails) {
+    throw new NotFoundError('Plano não encontrado')
+  }
+
+  if (totalTrails >= getPlan.plan.maxTrails) {
+    throw new ForbiddenError('Você atingiu o limite de trilhas')
+  }
+
   const createdTrail = await prisma.trail.create({
     data: {
       name: trail.name,
@@ -67,7 +93,6 @@ export const CreateTrail = async (trail: ICreateTrail, userId: string) => {
   })
   return createdTrail
 }
-
 export const UpdateTrail = async (trailId: string, trail: ICreateTrail, userId: string) => {
   const trailExists = await prisma.trail.findUnique({
     where: {
