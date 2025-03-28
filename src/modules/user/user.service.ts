@@ -8,7 +8,12 @@ export const CreateUser = async (data: ICreateUser, jwt: IInternalJWT) => {
     ...data,
     loginProviderId: jwt.loginProviderId,
     email: jwt.email,
-    profilePicture: jwt.user_metadata.avatar_url
+    profilePicture: jwt.user_metadata.avatar_url,
+    plan: {
+      connect: {
+        id: 1
+      }
+    }
   }
   await prisma.user.create({
     data: normalized
@@ -19,6 +24,14 @@ export const GetUserByProviderId = async (providerId: string) => {
   const user = await prisma.user.findUnique({
     where: {
       loginProviderId: providerId
+    },
+    include: {
+      plan: {
+        select: {
+          name: true,
+          maxTrails: true,
+        }
+      }
     }
   })
 
