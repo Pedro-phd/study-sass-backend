@@ -28,9 +28,11 @@ model user {
   enabled         Boolean         @default(true)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+  plan            plan            @relation(fields: [planId], references: [id])
   trail           trail[]
   trail_post      trail_post[]
   trail_ranking   trail_ranking[]
+  planId          Int
 }
 
 model trail {
@@ -71,4 +73,12 @@ model trail_ranking {
 
   trail trail @relation(fields: [trailId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user  user  @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model plan {
+  id           Int    @id @default(autoincrement())
+  name         String
+  maxTrails    Int
+  maxTrailPost Int
+  user         user[]
 }

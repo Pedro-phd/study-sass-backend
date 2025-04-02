@@ -1,9 +1,37 @@
 import { prisma } from "@/infra/prisma-client"
 import { ICreateTrailPost } from "./dto/create-trail-post.dto"
-import { IInternalJWT, NotFoundError } from "@/domain"
+import { ForbiddenError, IInternalJWT, NotFoundError } from "@/domain"
 import { eachDayOfInterval, format, getOverlappingDaysInIntervals, interval, isEqual } from "date-fns"
 
 export const CreateTrailPost = async (trailId: string, body: ICreateTrailPost, user: IInternalJWT) => {
+  
+  const getPlan = await prisma.user.findUnique({
+    where: {
+      id: user.id
+    },
+    select: {
+      plan: true
+    }
+  })
+
+  const totalPostsToday = await prisma.trail_post.count({
+    where: {
+      trailId: trailId,
+      ownerId: user.id,
+      createdAt: {
+        gte: new Date(new Date().setHours(0, 0, 0, 0))
+      }
+    }
+  })
+  
+    if (!getPlan?.plan?.maxTrails) {
+      throw new NotFoundError('Plano não encontrado')
+    }
+  
+    if (totalPostsToday >= getPlan.plan.maxTrailPost) {
+      throw new ForbiddenError('Você atingiu o limite de posts diários')
+    }
+
   const trail = await prisma.trail.findUnique({
     where: {
       id: trailId,
