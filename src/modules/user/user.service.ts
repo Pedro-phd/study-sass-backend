@@ -1,7 +1,7 @@
-import { prisma } from "@/infra/prisma-client"
+import { prisma } from "src/infra/prisma-client"
 import { ICreateUser } from "./dto"
 import { Prisma } from "@prisma/client"
-import { ConflictError, user, type IInternalJWT } from "@/domain"
+import { ConflictError, IInternalJWT, user } from "src/domain"
 
 export const CreateUser = async (data: ICreateUser, jwt: IInternalJWT) => {
   const normalized: Prisma.userCreateInput = {

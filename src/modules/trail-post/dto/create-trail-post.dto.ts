@@ -1,4 +1,4 @@
-import { trailPostSchema } from "@/domain";
+import { trailPostSchema } from "src/domain";
 import z from "zod";
 
 export const CreateTrailPostSchema = trailPostSchema.pick({

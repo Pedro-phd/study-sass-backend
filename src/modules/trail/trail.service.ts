@@ -1,6 +1,6 @@
-import { prisma } from "@/infra/prisma-client"
+import { prisma } from "../../infra/prisma-client"
 import { ICreateTrail } from "./dto"
-import { ForbiddenError, NotFoundError } from "@/domain"
+import { ForbiddenError, NotFoundError } from "../../domain/errors/errors"
 
 export const GetMyTrails = async (userId: string) => {
   const trails = await prisma.trail.findMany({

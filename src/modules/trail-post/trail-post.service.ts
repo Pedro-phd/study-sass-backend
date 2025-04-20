@@ -1,7 +1,7 @@
-import { prisma } from "@/infra/prisma-client"
+import { prisma } from "src/infra/prisma-client"
 import { ICreateTrailPost } from "./dto/create-trail-post.dto"
-import { ForbiddenError, IInternalJWT, NotFoundError } from "@/domain"
 import { eachDayOfInterval, format, getOverlappingDaysInIntervals, interval, isEqual } from "date-fns"
+import { ForbiddenError, IInternalJWT, NotFoundError } from "src/domain"
 
 export const CreateTrailPost = async (trailId: string, body: ICreateTrailPost, user: IInternalJWT) => {
   
